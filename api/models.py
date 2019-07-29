@@ -101,4 +101,9 @@ class MealsToOrder(models.Model):
     def __str__(self):
         return "%s, %s, %s" % (self.uniqueid, self.orderid, self.meals)
 
+class Meals(models.Model):
+
+    name = models.CharField(max_length=30)
+    count = models.IntegerField()
+
 

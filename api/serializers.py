@@ -120,7 +120,15 @@ class CheckSerializer(serializers.ModelSerializer):
 
 class MealsToOrderSerializer(serializers.ModelSerializer):
 
+    id = serializers.IntegerField(required=False)
+    meals = MealsSerializer(many=True)
+    
     class Meta:
         model = MealsToOrder
         fields = ('uniqueid', 'orderid', 'meals')
 
+    def create(self):
+        meals_data = validated_data.pop('meals')
+        mealstoorder = MealsToOrder.objects.create(**validated_data)
+        for meal_data in meals_data:
+            Meals.objects.create(mealstoorder = mealstoorder, **meal_data)
