@@ -1,5 +1,5 @@
-from api.models import *
-from api.serializers import *
+from .models import *
+from .serializers import *
 from rest_framework import generics, viewsets
 from django.shortcuts import render
 

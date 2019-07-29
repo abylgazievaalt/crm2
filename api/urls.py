@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from api import views
+from . import views
 #from rest_framework.schemas import get_schema_view
 
 # Create a router and register our viewsets with it.
@@ -12,7 +12,7 @@ router.register(r'tables', views.TableView)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-               #path('schema/', schema_view),
-               path('', include(router.urls)),
+               path('schema/', schema_view),
+               #path('', include(router.urls)),
                ]
 
