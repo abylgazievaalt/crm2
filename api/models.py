@@ -35,18 +35,19 @@ class User(models.Model):
     phone = models.CharField(max_length = 50)
 
     def __str__(self):
-        return "%s \n %s \n %s \n %s \n %s \n %s \n %s" % (self.name, self.surname, self.login, self.email, self.roleid, self.dateofadd, self.phone)
+        return "%s %s" % (self.name, self.surname)
 
-class Category(models.Model):
+class MealCategory(models.Model):
 
     name = models.CharField(max_length=50)
     departmentid = models.ForeignKey(Department,on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return "%s %s" % (self.name, self.departmentid)
+        return str(self.name)
 
 class Status(models.Model):
-
+    
+    #order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -54,56 +55,51 @@ class Status(models.Model):
 
 class ServicePercentage(models.Model):
 
-    percentage = models.IntegerField()
+    percentage = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.percentage)
 
 class Meal(models.Model):
-
+    
     name = models.CharField(max_length=50)
-    categoryid = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
-    price = models.IntegerField()
-    description = models.CharField(max_length=100)
+    categoryid = models.ForeignKey(MealCategory, on_delete=models.CASCADE, null=True)
+    price = models.IntegerField(default=0)
+    description = models.CharField(max_length=200)
     
     def __str__(self):
-        return "%s \n %s \n %s \n %s" % (self.name, self.categoryid, self.price, self.description)
+        return str(self.name)
 
 class Order(models.Model):
-    #waiterid
+    waiterid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     tableid = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
-    #tablename = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
-
-    isitopen = models.BooleanField(default=True)
+    tablename = Table.objects.get(id=tableid)
+    isitopen = models.IntegerField(default=0)
     date = models.DateTimeField(default=datetime.now, blank=True)
-    #mealsid = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
-
+    
+    def get_cost_sum(self):
+        return sum(orderitem.get_cost() for orderitem in self.mealsid.all())
+    
     def __str__(self):
-        return "%s, %s, %s, %s, %s" % (self.tableid, self.tablename, self.isitopen, self.date, self.mealsid)
+        return "%s, %s, %s, %s" % (self.tableid, self.tablename, self.isitopen, self.date)
+
+class OrderItem(models.Model):
+    
+    order = models.ForeignKey(Order, related_name='mealsid', on_delete=models.CASCADE, null=True)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
+    amount = models.IntegerField(default=0)
+
+    def get_cost(self):
+        return self.meal.price * self.count
 
 class Check(models.Model):
 
-    orderid = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+    orderid = models.OneToOneField(Order, on_delete=models.CASCADE, null=True)
     date = models.DateTimeField(default=datetime.now, blank=True)
-    servicefee = models.IntegerField()
-    #meals =
-    #totalsum = servicefee +
+    servicefee = models.ForeignKey(ServicePercentage, on_delete=None)
+    
+    def get_total_sum(self):
+        return self.order.get_total_sum() + self.servicefee.percentage
 
     def __str__(self):
         return "%s, %s, %s, %s" % (self.orderid, self.date, self.servicefee, self.totalsum)
-
-class MealsToOrder(models.Model):
-
-    uniqueid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    orderid = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
-    meals = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        return "%s, %s, %s" % (self.uniqueid, self.orderid, self.meals)
-
-class Meals(models.Model):
-
-    name = models.CharField(max_length=30)
-    count = models.IntegerField()
-
-

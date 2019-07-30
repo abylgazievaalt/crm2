@@ -1,17 +1,36 @@
 from .models import *
 from rest_framework import serializers
 
-class TableSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Table
-        fields = ('id', 'name')
-
 class UserSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = User
         fields = ['id', 'name', 'surname', 'login',
                   'password', 'email', 'roleid', 'dateofadd', 'phone']
+
+class TableSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Table
+        fields = ('id', 'name')
+
+class StatusSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Status
+        fields = ('id', 'name')
+
+class ServicePercentageSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ServicePercentage
+        fields = ('id', 'percentage')
+
+class MealSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Meal
+        fields = ('name', 'categoryid', 'price', 'description')
 
 class RoleSerializer(serializers.ModelSerializer):
     
@@ -28,12 +47,6 @@ class RoleSerializer(serializers.ModelSerializer):
             User.objects.create(roleid=role, **user)
         role.save()
         return role
-
-class MealSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Meal
-        fields = ('name', 'categoryid', 'price', 'description')
 
 class CategorySerializer(serializers.ModelSerializer):
 
@@ -67,37 +80,30 @@ class DepartmentSerializer(serializers.ModelSerializer):
         department.save()
         return department
 
-class StatusSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.ModelSerializer):
+    
+    id = serializers.PrimaryKeyRelatedField(queryset=Meal.objects.all(), source='meal.id')
+    name = serializers.CharField(source='meal.name', read_only=True)
+    price = serializers.CharField(source='meal.price', read_only=True)
+    total = serializers.IntegerField(source='get_cost', read_only=True)
     
     class Meta:
-        model = Status
-        fields = ('id', 'name')
-
-class ServicePercentageSerializer(serializers.ModelSerializer):
-    
-    
-    class Meta:
-        model = ServicePercentage
-        fields = ('id', 'percentage')
+        model = OrderItem
+        fields = ('id', 'name', 'count', 'price', 'total')
 
 class OrderSerializer(serializers.ModelSerializer):
-    
-    waiter = Role.objects.get(name='waiter')
-    waiterid = waiter.id
-    check = CheckSerializer(many=False)
-    mealsid = MealsToOrderSerializer(many=True)
+
+    mealsid = OrderItemSerializer(many=True, required=False, source='mealsid')
     
     class Meta:
         model = Order
-        fields = ('waiterid', 'tableid', 'isitopen', 'date')
+        fields = ('waiterid', 'tableid', 'tablename', 'isitopen', 'date', 'meals')
 
     def create(self, validated_data):
-        check_data = validated_data.pop('check')
-        mealstoorder_data = validated_data.pop('mealsid')
-        order = Order.objects.create(**validated_data)
-        for meal in mealstoorder_data:
-            MealsToOrder.objects.create(orderid=order, **meal)
-        Check.objects.create(orderid=order, **check_data)
+        meals_data = validated_data.pop('mealsid')
+        order = Order.objects.create(isitopen=1, **validated_data)
+        for meal in meals_data:
+            OrderItem.objects.create(**meal)
         order.save()
         return order
 
@@ -121,7 +127,7 @@ class CheckSerializer(serializers.ModelSerializer):
 class MealsToOrderSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(required=False)
-    meals = MealsSerializer(many=True)
+    meals = OrderItemSerializer(many=True)
     
     class Meta:
         model = MealsToOrder
@@ -131,4 +137,4 @@ class MealsToOrderSerializer(serializers.ModelSerializer):
         meals_data = validated_data.pop('meals')
         mealstoorder = MealsToOrder.objects.create(**validated_data)
         for meal_data in meals_data:
-            Meals.objects.create(mealstoorder = mealstoorder, **meal_data)
+            OrderItem.objects.create(mealstoorder = mealstoorder, **meal_data)
