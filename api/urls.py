@@ -6,8 +6,8 @@ from . import views
 # Create a router and register our viewsets with it.
 router = routers.DefaultRouter()
 #router.register(r'api', views.CourseView)
-router.register(r'categories', views.CategoryView)
-router.register(r'tables', views.TableView)
+router.register(r'categories', views.CategoriesView)
+router.register(r'tables', views.TablesView)
 #schema_view = get_schema_view(title='Pastebin API')
 
 # The API URLs are now determined automatically by the router.

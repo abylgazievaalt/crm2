@@ -27,7 +27,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'snippets.pagination.PageNumberPaginationDataOnly'
+    'DEFAULT_PAGINATION_CLASS': 'api.pagination.PageNumberPaginationDataOnly'
 }
 # Application definition
 
