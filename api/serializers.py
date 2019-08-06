@@ -1,12 +1,12 @@
-from .models import *
+from api.models import *
 from rest_framework import serializers
 
 class UsersSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = User
         fields = ['id', 'name', 'surname', 'login',
-                  'password', 'email', 'roleid', 'dateofadd', 'phone']
+          'password', 'email', 'roleid', 'dateofadd', 'phone']
 
 class TablesSerializer(serializers.ModelSerializer):
 
@@ -15,19 +15,19 @@ class TablesSerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 class ServicePercentageSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = ServicePercentage
         fields = ('id', 'percentage')
 
 class MealsSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = Meal
         fields = ('name', 'categoryid', 'price', 'description')
 
 class RolesSerializer(serializers.ModelSerializer):
-    
+
     users = UsersSerializer(many=True)
 
     class Meta:
@@ -45,7 +45,7 @@ class RolesSerializer(serializers.ModelSerializer):
 class MealCategoriesSerializer(serializers.ModelSerializer):
 
     meals = MealsSerializer(many=True)
-    
+
     class Meta:
         model = MealCategory
         fields = ('name', 'departmentid')
@@ -59,13 +59,13 @@ class MealCategoriesSerializer(serializers.ModelSerializer):
         return category
 
 class DepartmentsSerializer(serializers.ModelSerializer):
-    
+
     categories = MealCategoriesSerializer(many=True)
-    
+
     class Meta:
         model = Department
         fields = ('id', 'name')
-    
+
     def create(self, validated_data):
         categories_data = validated_data.pop('categories')
         department = Department.objects.create(**validated_data)
@@ -75,12 +75,12 @@ class DepartmentsSerializer(serializers.ModelSerializer):
         return department
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    
+
     id = serializers.PrimaryKeyRelatedField(queryset=Meal.objects.all(), source='meal.id')
     name = serializers.CharField(source='meal.name', read_only=True)
     price = serializers.CharField(source='meal.price', read_only=True)
     total = serializers.IntegerField(source='get_total', read_only=True)
-    
+
     class Meta:
         model = OrderItem
         fields = ('id', 'name', 'count', 'price', 'total')
@@ -91,7 +91,7 @@ class OrdersSerializer(serializers.ModelSerializer):
     table_id = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), source='table.id',)
     table_name = serializers.CharField(source='table.name', read_only=True)
     mealsid = OrderItemSerializer(many=True, required=False, source='mealsid')
-    
+
     class Meta:
         model = Order
         fields = ('waiterid', 'tableid', 'tablename', 'isitopen', 'date', 'meals')
@@ -105,9 +105,9 @@ class OrdersSerializer(serializers.ModelSerializer):
         return order
 
 class StatusSerializer(serializers.ModelSerializer):
-    
-    order = OrderSerializer()
-    
+
+    order = OrdersSerializer()
+
     class Meta:
         model = Status
         fields = ('id', 'name')
@@ -115,14 +115,14 @@ class StatusSerializer(serializers.ModelSerializer):
 class MealsToOrderSerializer(serializers.ModelSerializer):
 
     meals = OrderItemSerializer(many=True)
-    
+
     class Meta:
         model = Order
         fields = ('mealsid',)
 
 class ChecksSerializer(serializers.ModelSerializer):
-    
-    orderid = OrderSerializer()
+
+    orderid = OrdersSerializer()
     meals = MealsToOrderSerializer(read_only=True)
 
     class Meta:
@@ -132,7 +132,6 @@ class ChecksSerializer(serializers.ModelSerializer):
     def create(self):
         order.isitopen = False
         order.save()
-        check = Check.objects.create(order=order, percentage = ServicePercentage.objects.all()[0], **validated_data)
-        check.save()
-        return check
-
+        checks = Check.objects.create(order=order, percentage = ServicePercentage.objects.all()[0], **validated_data)
+        checks.save()
+        return checks

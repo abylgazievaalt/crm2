@@ -1,18 +1,16 @@
 from django.urls import path, include
 from rest_framework import routers
-from . import views
-#from rest_framework.schemas import get_schema_view
+from api import views
 
 # Create a router and register our viewsets with it.
 router = routers.DefaultRouter()
 #router.register(r'api', views.CourseView)
-router.register(r'categories', views.CategoriesView)
+
 router.register(r'tables', views.TablesView)
-#schema_view = get_schema_view(title='Pastebin API')
+router.register(r'categories', views.CategoriesView)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-               path('schema/', schema_view),
-               #path('', include(router.urls)),
-               ]
+               path('', include(router.urls))
+]
 

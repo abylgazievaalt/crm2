@@ -1,6 +1,8 @@
-from django.urls import path, include
+from django.conf.urls import include, url
+from rest_framework import routers
 
 urlpatterns = [
-               path('', include('api.urls')),
+    url('^', include('api.urls')),
                #path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
+
