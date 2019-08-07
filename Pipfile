@@ -10,6 +10,7 @@ django = "*"
 djangorestframework = "*"
 python-decouple = "*"
 psycopg2 = "*"
+djangorestframework-jwt = "*"
 
 [requires]
 python_version = "3.6"

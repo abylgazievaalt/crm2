@@ -1,8 +1,8 @@
-from django.conf.urls import include, url
-from rest_framework import routers
+from django.contrib import admin
+from django.conf.urls import url, include
+from api import views
 
 urlpatterns = [
-    url('^', include('api.urls')),
-               #path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-]
-
+               url('admin/', admin.site.urls),
+               url(r'^', include('api.urls')),
+               ]

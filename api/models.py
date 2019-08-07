@@ -62,7 +62,7 @@ class Meal(models.Model):
         return str(self.name)
 
 class Order(models.Model):
-    waiterid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    # waiterid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     tableid = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
     #tablename = Table.objects.get(id=tableid)
     isitopen = models.IntegerField(default=0)
