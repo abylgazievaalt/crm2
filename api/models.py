@@ -39,7 +39,7 @@ class User(models.Model):
 class MealCategory(models.Model):
 
     name = models.CharField(max_length=50)
-    departmentid = models.ForeignKey(Department,on_delete=models.CASCADE, null=True)
+    departmentid = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return str(self.name)
@@ -66,7 +66,7 @@ class Order(models.Model):
     tableid = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
     #tablename = Table.objects.get(id=tableid)
     isitopen = models.IntegerField(default=0)
-    date = models.DateTimeField(default=datetime.now, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def get_total_cost(self):
         return sum(orderitem.get_total() for orderitem in self.mealsid.all())
@@ -76,7 +76,7 @@ class Order(models.Model):
 
 class Status(models.Model):
 
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+    #order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -94,8 +94,8 @@ class OrderItem(models.Model):
 class Check(models.Model):
 
     orderid = models.ForeignKey(Order, on_delete=models.CASCADE)
-    date = models.DateTimeField(default=datetime.now, blank=True)
-    servicefee = models.ForeignKey(ServicePercentage, on_delete=None)
+    date = models.DateTimeField(auto_now_add=True)
+    servicefee = models.ForeignKey(ServicePercentage, on_delete=models.CASCADE)
 
     def get_total_sum(self):
         return self.order.get_total_cost() + self.servicefee.percentage

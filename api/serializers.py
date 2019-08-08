@@ -9,25 +9,31 @@ class UsersSerializer(serializers.ModelSerializer):
           'password', 'email', 'roleid', 'dateofadd', 'phone']
 
 class TablesSerializer(serializers.ModelSerializer):
-
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Table
         fields = ('id', 'name')
 
 class ServicePercentageSerializer(serializers.ModelSerializer):
-
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = ServicePercentage
         fields = ('id', 'percentage')
 
-class MealsSerializer(serializers.ModelSerializer):
+class MealCategoriesSerializer(serializers.ModelSerializer):
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    class Meta:
+        model = MealCategory
+        fields = ('name', 'departmentid')
 
+class MealsSerializer(serializers.ModelSerializer):
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Meal
         fields = ('name', 'categoryid', 'price', 'description')
 
 class RolesSerializer(serializers.ModelSerializer):
-
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     # users = UsersSerializer(many=True)
 
     class Meta:
@@ -43,24 +49,8 @@ class RolesSerializer(serializers.ModelSerializer):
         return role
 '''
 
-class MealCategoriesSerializer(serializers.ModelSerializer):
-
-    #meals = MealsSerializer(many=True)
-
-    class Meta:
-        model = MealCategory
-        fields = ('name', 'departmentid')
-'''
-    def create(self, validated_data):
-        meals_data = validated_data.pop('meals')
-        category = MealCategory.objects.create(**validated_data)
-        for meal in meals_data:
-            Meal.objects.create(categoryid=category, **meal)
-        category.save()
-        return category
-'''
 class DepartmentsSerializer(serializers.ModelSerializer):
-
+    serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     # categories = MealCategoriesSerializer(many=True)
 
     class Meta:
@@ -88,8 +78,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrdersSerializer(serializers.ModelSerializer):
     #waiterid = serializers.IntegerField(source='waiter.id', read_only=True)
-    isitopen = serializers.BooleanField(read_only=True, default=True)
-    tableid = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), source='table.id',)
+    #isitopen = serializers.BooleanField(read_only=True, default=True)
+    #tableid = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), source='table.id',)
     tablename = serializers.CharField(source='table.name', read_only=True)
     mealsid = OrderItemSerializer(many=True, required=False)
 
@@ -123,7 +113,7 @@ class MealsToOrderSerializer(serializers.ModelSerializer):
 
 class ChecksSerializer(serializers.ModelSerializer):
 
-    orderid = OrdersSerializer()
+    #orderid = OrdersSerializer()
     meals = MealsToOrderSerializer(read_only=True)
 
     class Meta:
