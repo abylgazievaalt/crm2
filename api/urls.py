@@ -8,6 +8,7 @@ urlpatterns = [
                url(r'^department/$', views.DepartmentList.as_view(),name='department'),
                url(r'^department/(?P<pk>[0-9]+)/$', views.DepartmentDetail.as_view()),
                url(r'^servicepercentage/(?P<pk>[0-9]+)/$', views.ServicePercentageDetail.as_view()),
+               url(r'^servicepercentage/$', views.ServicePercentageList.as_view(), name='servicepercentage'),
                url(r'^meal/$', views.MealList.as_view(),name='meal'),
                url(r'^meal/(?P<pk>[0-9]+)/$', views.MealDetail.as_view()),
                url(r'^check/$', views.CheckList.as_view(),name='check'),

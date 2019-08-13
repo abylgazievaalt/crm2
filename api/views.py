@@ -31,12 +31,12 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UsersSerializer
 
 class CategoryList(generics.ListCreateAPIView):
-    queryset = MealCategory.objects.all()
-    serializer_class = MealCategoriesSerializer
+    queryset = Category.objects.all()
+    serializer_class = CategoriesSerializer
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = MealCategory.objects.all()
-    serializer_class = MealCategoriesSerializer
+    queryset = Category.objects.all()
+    serializer_class = CategoriesSerializer
 
 class RoleList(generics.ListCreateAPIView):
     queryset = Role.objects.all()
