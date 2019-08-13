@@ -73,7 +73,7 @@ class MealsToOrderSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ('mealsid',)
+        fields = ('ordered_meals',)
 
 class OrdersSerializer(serializers.ModelSerializer):
     waiterid = serializers.HiddenField(default=serializers.CurrentUserDefault())

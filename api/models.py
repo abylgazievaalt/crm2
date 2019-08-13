@@ -72,10 +72,10 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def get_total_cost(self):
-        return sum(orderitem.get_total() for orderitem in self.mealsid.all())
+        return sum(orderitem.get_total() for orderitem in self.ordered_meals.all())
 
     def __str__(self):
-        return "%s, %s, %s, %s" % (self.table, self.tablename, self.isitopen, self.date)
+        return "%s, %s, %s" % (self.table, self.isitopen, self.date)
 
 class Status(models.Model):
 
@@ -87,7 +87,7 @@ class Status(models.Model):
 
 class OrderItem(models.Model):
 
-    order = models.ForeignKey(Order, related_name='mealsid', on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(Order, related_name='ordered_meals', on_delete=models.CASCADE, null=True)
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE, null=True)
     amount = models.IntegerField(default=0)
 
