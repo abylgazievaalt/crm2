@@ -5,4 +5,5 @@ from api import views
 urlpatterns = [
                url('admin/', admin.site.urls),
                url(r'^', include('api.urls')),
+               url('accounts/', include('django.contrib.auth.urls')),
                ]
