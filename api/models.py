@@ -5,70 +5,65 @@ from django.conf import settings
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
 class UserManager(BaseUserManager):
-    def create_user(self, role, name, surname, username, email, phone=None, password=None):
-        if username is None:
-            raise TypeError('Users must have a username')
-
-        if email is None:
-            raise TypeError('Users must have an email address')
-
-        user = self.model(role=role, username=username,  email=self.normalize_email(email), name=name, surname=surname, phone=phone)
+    use_in_migrations = True
+    
+    def _create_user(self, email, password, **extra_fields):
+        if not email:
+            raise ValueError('The given login must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
-        user.save()
-
+        user.save(using=self._db)
         return user
-
-    def create_superuser(self, username, email, name, surname, password=None, phone=None):
-        if password is None:
-            raise TypeError('Superusers must have a password')
-
-        user = self.create_user(username=username, email=email, password=password, phone=phone, name=name, surname=surname)
-        user.is_superuse = True
-        user.is_staff = True
-        user.save()
-
-        return user
+    
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+    
+    def create_superuser(self, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self._create_user(email, password=password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-
-    name = models.CharField(db_index=True, max_length = 50)
-    surname = models.CharField(db_index=True, max_length = 50)
-    username = models.CharField(db_index=True, max_length = 255, unique=True)
-    #password = models.CharField(max_length = 50)
+    role = models.ForeignKey('Role', null=True, on_delete=models.SET_NULL)
+    name = models.CharField(db_index=True, max_length=255)
+    surname = models.CharField(db_index=True, max_length=255)
+    username = models.CharField(db_index=True, max_length=255, unique=True)
     email = models.EmailField(db_index=True, unique=True)
-    role = models.ForeignKey('Role', on_delete=models.CASCADE)
-    dateofadd = models.DateTimeField(auto_now_add=True)
-    phone = models.CharField(max_length = 50)
+    phone = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     
     objects = UserManager()
     
     def __str__(self):
-        return self.email
+        return self.username
     
     @property
     def token(self):
         return self._generate_jwt_token()
-
+    
     def get_full_name(self):
-        return "%s %s" % (self.name, self.surname)
-
+        return self.name + " " + self.surname
+    
     def get_short_name(self):
-        return self.username
-
+        return self.name
+    
     def _generate_jwt_token(self):
         dt = datetime.now() + timedelta(days=60)
-
+        
         token = jwt.encode({
-            'id':self.pk,
-            'exp':int(dt.strftime('%s'))
-            }, settings.SECRET_KEY, algorithm='HS256')
-
+                           'id': self.pk,
+                           'exp': int(dt.strftime('%s'))
+                           }, settings.SECRET_KEY, algorithm='HS256')
+                           
         return token.decode('utf-8')
 
 class Table(models.Model):

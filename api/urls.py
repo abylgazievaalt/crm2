@@ -4,6 +4,7 @@ from api import views
 #from .views import CreateUserAPIView, UserRetrieveUpdateAPIView
 from rest_framework_jwt.views import obtain_jwt_token
 
+
 urlpatterns = [
                url(r'^department/$', views.DepartmentList.as_view(),name='department'),
                url(r'^department/(?P<pk>[0-9]+)/$', views.DepartmentDetail.as_view()),
@@ -24,4 +25,7 @@ urlpatterns = [
                url(r'^category/$', views.CategoryList.as_view(),name='category'),
                url(r'^category/(?P<pk>[0-9]+)/$', views.CategoryDetail.as_view()),
                url(r'^api-auth/', include('rest_framework.urls')),
+               url(r'^users/?$', views.RegistrationAPIView.as_view()),
+               url(r'^users/login/?$', views.LoginAPIView.as_view()),
+               url(r'^user', views.UserRetrieveUpdateAPIView.as_view()),
                ]

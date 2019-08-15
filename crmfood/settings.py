@@ -27,6 +27,8 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'crmfood.exceptions.core_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.PageNumberPaginationDataOnly'
 }
 # Application definition
