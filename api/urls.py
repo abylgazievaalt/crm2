@@ -27,5 +27,5 @@ urlpatterns = [
                url(r'^api-auth/', include('rest_framework.urls')),
                url(r'^users/?$', views.RegistrationAPIView.as_view()),
                url(r'^users/login/?$', views.LoginAPIView.as_view()),
-               url(r'^user', views.UserRetrieveUpdateAPIView.as_view()),
+               url(r'^user/?$', views.UserRetrieveUpdateAPIView.as_view()),
                ]

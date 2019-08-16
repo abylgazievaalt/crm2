@@ -125,16 +125,16 @@ class Meal(models.Model):
         return str(self.name)
 
 class Order(models.Model):
-    waiterid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    waiterid = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE, null=True)
-    isitopen = models.IntegerField(default=0)
+    isitopen = models.BooleanField(default=True)
     date = models.DateTimeField(auto_now_add=True)
     
     def get_total_cost(self):
-        return sum(item.get_cost() for item in self.meals_order.all())
+        return sum(item.get_cost() for item in self.meals.all())
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='ordered_meals', on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey(Order, related_name='meals', on_delete=models.CASCADE, null=True)
     meal =  models.ForeignKey(Meal,on_delete=models.CASCADE, null=True)
     count = models.IntegerField(default=1)
     
@@ -144,14 +144,9 @@ class OrderItem(models.Model):
 
 class Check(models.Model):
     #waiter = models.ForeignKey(User, related_name='Checks', on_delete=models.SET_NULL, null=True)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, related_name='Checks')
+    order = models.ForeignKey(Order, unique=True, on_delete=models.CASCADE, default=None)
     date = models.DateTimeField(auto_now_add=True)
-    servicefee = models.ForeignKey(ServicePercentage, on_delete=models.SET_NULL, null=True)
-    
-    class Meta:
-        verbose_name = 'Check'
-        verbose_name_plural = 'Checks'
-        default_related_name = 'checks'
+    servicefee = models.ForeignKey(ServicePercentage, on_delete=None, default=None)
     
     def get_total_sum(self):
         return self.order.get_total_cost() + self.servicefee.percentage

@@ -13,7 +13,7 @@ from rest_framework.generics import RetrieveUpdateAPIView
 #from rest_framework_jwt.settings import api_settings
 #from django.contrib.auth.signals import user_logged_in
 
-class UserRetriveUpdateAPIView(RetrieveUpdateAPIView):
+class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UsersSerializer
