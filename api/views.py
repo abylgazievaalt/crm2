@@ -7,24 +7,21 @@ from django.shortcuts import render
 from .renderers import UserJSONRenderer
 from api.models import *
 from api.serializers import *
-from rest_framework.generics import RetrieveUpdateAPIView
-#from rest_framework.permissions import IsAuthenticated
-#from rest_framework.decorators import api_view, permission_classes
-#from rest_framework_jwt.settings import api_settings
-#from django.contrib.auth.signals import user_logged_in
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UsersSerializer
-
+    queryset = User.objects.all()
+    
     def retrieve(self, request, *args, **kwargs):
-        serializer = self.serializer_class(request.user)
+        serializer = UsersSerializer(request.user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        serializer_data = request.data.get('user', {})
+        serializer_data = request.data.get('user')
 
         serializer = self.serializer_class(request.user, data=serializer_data, partial=True)
 
@@ -33,13 +30,36 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def destroy(self, request, *args, **kwargs):
+        self.renderer_classes = JSONRenderer
+        
+        user_id = request.data.get('user_id', None)
+        
+        try:
+            user = self.queryset.get(id=user_id)
+        except User.DoesNotExist:
+            raise Http404
+        else:
+            user.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UsersSerializer
+
+class UserListAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = UsersSerializer
+    
+    queryset = User.objects.all()
+
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
-        user = request.data.get('user', {})
+        user = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -52,7 +72,7 @@ class LoginAPIView(APIView):
     serializer_class = LoginSerializer
     
     def post(self, request):
-        user = request.data.get('user', {})
+        user = request.data
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
@@ -65,14 +85,6 @@ class TableList(generics.ListCreateAPIView):
 class TableDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Table.objects.all()
     serializer_class = TablesSerializer
-
-class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UsersSerializer
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UsersSerializer
 
 class CategoryList(generics.ListCreateAPIView):
     queryset = Category.objects.all()
@@ -145,3 +157,10 @@ class CheckList(generics.ListCreateAPIView):
 class CheckDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Check.objects.all()
     serializer_class = ChecksSerializer
+
+class ActiveOrdersList(APIView):
+    def get(self, request):
+        orders = Order.objects.filter(isitopen=1)
+        serializer = OrdersSerializer(orders, many=True)
+        
+        return Response(serializer.data)

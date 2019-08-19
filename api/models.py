@@ -108,7 +108,7 @@ class ServicePercentage(models.Model):
 
 class Status(models.Model):
     
-    #order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50)
     
     def __str__(self):

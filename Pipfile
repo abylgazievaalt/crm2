@@ -11,6 +11,8 @@ djangorestframework = "*"
 python-decouple = "*"
 psycopg2 = "*"
 djangorestframework-jwt = "*"
+unittest = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.6"
