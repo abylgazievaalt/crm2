@@ -26,8 +26,10 @@ urlpatterns = [
                url(r'^category/$', views.CategoryList.as_view(),name='category'),
                url(r'^category/(?P<pk>[0-9]+)/$', views.CategoryDetail.as_view()),
                url(r'^api-auth/', include('rest_framework.urls')),
-               url(r'^signup/$', views.RegistrationAPIView.as_view()),
-               url(r'^login/$', views.LoginAPIView.as_view()),
+               url(r'^signup/$', views.RegistrationAPIView.as_view(), name='signup'),
+               url(r'^login/$', views.LoginAPIView.as_view(), name='login'),
                url(r'^user/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
                url(r'^user/$', views.UserListAPIView.as_view(), name='user'),
+               url(r'^obtain_token/',obtain_jwt_token),
+               #url(r'^update/$', UserRetrieveUpdateAPIView.as_view()),
                ]

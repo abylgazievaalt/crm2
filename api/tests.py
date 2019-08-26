@@ -3,6 +3,9 @@ from .models import *
 from .serializers import *
 import unittest
 from rest_framework.test import APITestCase, APIRequestFactory
+from random_word import RandomWords
+
+r = RandomWords()
 
 class TableTestCase(unittest.TestCase):
     def setUp(self):
@@ -26,14 +29,8 @@ class TableTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/table/100/')
+        response = self.client.get('/table/10000/')
         self.assertEqual(response.status_code, 404)
-    
-    #def test_invalid_post_request(self):
-    #   response = self.client.post('/table/', {
-    #                              "nme": 15
-    #                                })
-    #   self.assertEqual(response.status_code, 400)
     
     def test_list_tables(self):
         response = self.client.get('/table/')
@@ -68,14 +65,8 @@ class RoleTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/role/100/')
+        response = self.client.get('/role/10000/')
         self.assertEqual(response.status_code, 404)
-    
-    #def test_invalid_post_request(self):
-    #   response = self.client.post('/role/', {
-    #                               "role": "chef"
-    #                               })
-    #   self.assertEqual(response.status_code, 400)
     
     def test_list_roles(self):
         response = self.client.get('/role/')
@@ -113,12 +104,6 @@ class DepartmentTestCase(unittest.TestCase):
         response = self.client.get('/department/100000/')
         self.assertEqual(response.status_code, 404)
     
-    #def test_invalid_post_request(self):
-    #   response = self.client.post('/department/', {
-    #                              "name": 1
-    #                               })
-    #   self.assertEqual(response.status_code, 400)
-    
     def test_list_departments(self):
         response = self.client.get('/department/')
         departments = Department.objects.all()
@@ -151,15 +136,8 @@ class CategoryTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/category/100/')
+        response = self.client.get('/category/10000/')
         self.assertEqual(response.status_code, 404)
-    
-    #def test_invalid_post_request(self):
-    # response = self.client.post('/category/', {
-    #                             "name": 1,
-    #                              "department": 10
-    #                              })
-    #   self.assertEqual(response.status_code, 400)
     
     def test_list_categories(self):
         response = self.client.get('/category/')
@@ -194,14 +172,8 @@ class ServicePercentageTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/servicepercentage/100/')
+        response = self.client.get('/servicepercentage/10000/')
         self.assertEqual(response.status_code, 404)
-
-        #    def test_invalid_post_request(self):
-        #response = self.client.post('/servicepercentage/', {
-        #                            "percentag": "20"
-        #                           })
-        #self.assertEqual(response.status_code, 400)
     
     def test_list_servicefees(self):
         response = self.client.get('/servicepercentage/')
@@ -240,14 +212,8 @@ class MealTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/meal/100/')
+        response = self.client.get('/meal/10000/')
         self.assertEqual(response.status_code, 404)
-    
-    #def test_invalid_post_request(self):
-    #    response = self.client.post('/meal/', {
-    #                               "name": "3 shokolada"
-    #                               })
-    #   self.assertEqual(response.status_code, 400)
     
     def test_list_meals(self):
         response = self.client.get('/meal/')
@@ -261,36 +227,132 @@ class OrderTestCase(unittest.TestCase):
     def setUp(self):
         self.client = Client()
     
-    def test_create_todo(self):
-        response = self.client.post('/order/', {
-                                    "tableid": 1,
-                                    "meals": [
-                                        {
-                                            "id": 1,
-                                            "count": 2
-                                        }
-                                        ]
-                                    })
-        self.assertEqual(response.status_code, 201)
+    #def test_create_todo(self):
+    #  response = self.client.post('/order/', {
+    #                              "tableid": 1,
+    #                                "meals" : [
+    #                                          {
+    #                                          "id": 1,
+    #                                          "count": 3
+    #                                          },
+    #                                          {
+    #                                          "id": 2,
+    #                                          "count": 1
+    #                                          }
+    #                                          ]
+    #                                })
+    #   self.assertEqual(response.status_code, 201)
     
     def test_details(self):
         response = self.client.get('/order/1/')
         self.assertEqual(response.status_code, 200)
     
     def test_not_found(self):
-        response = self.client.get('/order/100/')
+        response = self.client.get('/order/10000/')
         self.assertEqual(response.status_code, 404)
-    
-    # def test_invalid_post_request(self):
-    #   response = self.client.post('/order/', {
-    #                                "name": "3 shokolada"
-    #                               })
-    #   self.assertEqual(response.status_code, 400)
-    
+
     def test_list_orders(self):
         response = self.client.get('/order/')
         orders = Order.objects.all()
         serializer = OrdersSerializer(orders, many=True)
         
         self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, 200)
+
+class CheckTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client()
+    
+    def test_create_todo(self):
+        id = Order.objects.last().id
+        response = self.client.post('/check/', {
+                                    "orderid": id,
+                                    })
+        self.assertEqual(response.status_code, 201)
+    
+    def test_details(self):
+        response = self.client.get('/check/1/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_not_found(self):
+        response = self.client.get('/check/10000/')
+        self.assertEqual(response.status_code, 404)
+    
+    def test_list_checks(self):
+        response = self.client.get('/check/')
+        checks = Check.objects.all()
+        serializer = ChecksSerializer(checks, many=True)
+        
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, 200)
+
+class CheckTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client()
+    
+    def test_create_todo(self):
+        id = Order.objects.last().id
+        response = self.client.post('/check/', {
+                                    "orderid": id,
+                                    })
+        self.assertEqual(response.status_code, 201)
+    
+    def test_details(self):
+        response = self.client.get('/check/1/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_not_found(self):
+        response = self.client.get('/check/10000/')
+        self.assertEqual(response.status_code, 404)
+    
+    def test_list_checks(self):
+        response = self.client.get('/check/')
+        checks = Check.objects.all()
+        serializer = ChecksSerializer(checks, many=True)
+        
+        self.assertEqual(response.data, serializer.data)
+        self.assertEqual(response.status_code, 200)
+
+class UserTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client()
+    
+    def test_details(self):
+        response = self.client.get('/user/1/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_not_found(self):
+        response = self.client.get('/user/10000/')
+        self.assertEqual(response.status_code, 404)
+    
+    #def test_list_users(self):
+    #   response = self.client.get('/user/')
+    #   users = User.objects.all()
+    #   serializer = UsersSerializer(users, many=True)
+        
+        #self.assertEqual(response.data, serializer.data)
+        #self.assertEqual(response.status_code, 200)
+
+class RegistrationTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client()
+    
+    def test_post_response(self):
+        rand = r.get_random_word()
+        response = self.client.post('/signup/', {
+                                    "email": rand + "@gmail.com",
+                                    "username": rand,
+                                    "password": "password12"
+                                    })
+        self.assertEqual(response.status_code, 201)
+
+class LoginTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client = Client()
+    
+    def test_post_response(self):
+        response = self.client.post('/login/', {
+                                    "email": "ab@gmail.com",
+                                    "password": "password123"
+                                    })
         self.assertEqual(response.status_code, 200)

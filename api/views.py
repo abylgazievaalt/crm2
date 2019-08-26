@@ -11,7 +11,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 
 class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
+    #renderer_classes = (UserJSONRenderer,)
     serializer_class = UsersSerializer
     queryset = User.objects.all()
     
@@ -55,7 +55,7 @@ class UserListAPIView(ListAPIView):
 
 class RegistrationAPIView(APIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    #renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
 
     def post(self, request):
@@ -68,7 +68,7 @@ class RegistrationAPIView(APIView):
 
 class LoginAPIView(APIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    #renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
     
     def post(self, request):
